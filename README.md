@@ -7,9 +7,11 @@ Firmware Arduino para aplicar carga reproducible a un ESP32 o ESP32-S3 y observa
 ## Cargar el firmware y abrir el panel
 
 1. Abre `ESP32_Power_Stress_Test__1.ino` en Arduino IDE. Conserva `portal.h` (panel web), `report.h` (estadísticas del ensayo) y `serial_load.h` (prueba interna de UART1) junto al sketch en la carpeta `ESP32_Power_Stress_Test__1`.
-2. En el gestor de placas instala **esp32 by Espressif Systems**. En el gestor de bibliotecas instala **WebSockets** de Markus Sattler (en este equipo está instalada la versión 2.6.1). Selecciona tu modelo de placa y su puerto USB. Pulsa **Subir** y espera a que el IDE confirme la carga.
-3. Conecta el teléfono o computador a **ESP32-Power-Test** (red abierta, sin contraseña). Si el teléfono avisa que la red carece de internet, elige mantener la conexión.
-4. Abre **http://192.168.4.1/** en el navegador. El título debe ser **ESP32 Stress Lab**. Debajo aparecen la duración, los accesos rápidos y los botones **INICIAR PRUEBA** y **DETENER**.
+2. En el gestor de placas instala **esp32 by Espressif Systems** (versión usada en este proyecto: **2.0.17**). Este paquete incluye WiFi, WiFiUDP, WebServer, Preferences y el controlador UART.
+3. Instala **WebSockets 2.6.1** de Markus Sattler, la única biblioteca externa del sketch. En Arduino IDE abre **Programa → Incluir librería → Añadir biblioteca .ZIP** y selecciona el [ZIP incluido en el proyecto](librerias/WebSockets-2.6.1.zip) sin descomprimirlo. También puedes instalar esa versión desde el gestor de bibliotecas.
+4. Selecciona tu modelo de placa y su puerto USB. Pulsa **Subir** y espera a que el IDE confirme la carga.
+5. Conecta el teléfono o computador a **ESP32-Power-Test** (red abierta, sin contraseña). Si el teléfono avisa que la red carece de internet, elige mantener la conexión.
+6. Abre **http://192.168.4.1/** en el navegador. El título debe ser **ESP32 Stress Lab**. Debajo aparecen la duración, los accesos rápidos y los botones **INICIAR PRUEBA** y **DETENER**.
 
 **Primera prueba:** pulsa **1 min** y luego **INICIAR PRUEBA**. Comprueba que el estado indique **En curso** y que aparezcan muestras en **Telemetría en vivo**. Al terminar, encontrarás el resumen en **Informe automático**, debajo del gráfico.
 
