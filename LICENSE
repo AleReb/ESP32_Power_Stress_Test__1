@@ -1,0 +1,14 @@
+ESP32 Stress Lab
+
+El firmware, el software y la documentación general propios de este proyecto
+se distribuyen bajo la GNU General Public License, exclusivamente en su
+versión 3 (GPL-3.0-only). Esto incluye el sketch de Arduino, los archivos de
+cabecera, la interfaz web, el README, el manual en HTML y PDF y la captura
+del portal. El texto completo se encuentra en LICENSES/GPL-3.0-only.txt.
+
+Los diseños de hardware propios y su documentación de diseño se distribuyen
+bajo CERN-OHL-S-2.0. Esta distribución no incluye archivos de diseño de
+hardware. El texto completo se encuentra en LICENSES/CERN-OHL-S-2.0.txt.
+
+Los componentes de terceros, incluido el núcleo Arduino para ESP32 y sus
+bibliotecas, conservan sus respectivas licencias.

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Control de pruebas del ESP32</title>
+<style>
+*{box-sizing:border-box}body{font:18px system-ui,sans-serif;max-width:640px;margin:4vh auto;padding:16px;background:#111c24;color:#edf6f8}
+h1{font-size:1.6rem}form{display:grid;gap:14px;background:#20313d;padding:16px;border-radius:10px}label{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+input,select,button{font:inherit;padding:8px;border-radius:6px;border:1px solid #84989e}input[type=number]{width:6em}button{color:white;font-weight:bold;cursor:pointer;padding:14px}
+.start{background:#086448}.stop{background:#98313e}a{color:#91dfef}
+</style>
+<h1>Control de pruebas del ESP32</h1>
+<p>La placa se prueba a sí misma. El step-up solo suministra energía. Deja libres los pines GPIO.</p>
+<p>Conéctate a <b>ESP32-Power-Test</b> sin contraseña. Al pulsar un botón se abrirá el panel de la placa.</p>
+<form method="post" action="http://192.168.4.1/start">
+<label>Duración en minutos <input name="minutes" type="number" min="0" max="43200" value="1" required></label>
+<button class="start">INICIAR PRUEBA</button>
+<button class="stop" formaction="http://192.168.4.1/stop" formnovalidate>DETENER PRUEBA</button>
+<label>Patrón <select name="pattern"><option value="guided">Benchmark de alimentación</option><option value="pulse">Pulsante</option><option value="constant" selected>Constante</option><option value="ramp">Rampa</option></select></label>
+<label>Carga máxima (%) <input name="peak" type="number" min="0" max="100" value="100" required></label>
+<label>Período (segundos) <input name="period" type="number" min="1" max="3600" value="5" required></label>
+<label>Núcleos <select name="cores"><option value="auto" selected>Todos los disponibles</option><option>1</option><option>2</option></select></label>
+<label>Generar tráfico Wi-Fi <input name="wifi" type="checkbox" checked></label>
+<label>Tráfico serie interno (UART1) <input name="serial" type="checkbox"></label>
+<small>El benchmark combina reposo, pulsos y carga sostenida. Elige una duración de al menos 1 minuto. En los otros patrones, 0 permite dejar la prueba sin límite.</small>
+</form><p><a href="http://192.168.4.1/#informe">Ver informe automático de la placa</a></p><p><a href="http://192.168.4.1/">Abrir el panel completo para ver gráficos, leer el informe o configurar la red local</a></p>
+<p>Si la placa ya está en tu red local, abre la IP indicada por el monitor serie o por el panel del punto de acceso. Desde esa dirección también puedes iniciar y detener la prueba.</p>
+<section><h2>Comparar informes guardados</h2>
+<p>Selecciona uno o dos TXT de ESP32 Stress Lab. Se leen en este navegador, incluso con la placa apagada. Cada barra representa el resumen de un ensayo.</p>
+<input type="file" id="files" multiple accept=".txt,text/plain"><div id="comparison" aria-live="polite"></div></section>
+<script>
+const fields=[
+  ['Duración observada','s',/Tiempo observado: (\d+) s/],
+  ['Peor exceso del intervalo de muestreo','ms',/Retraso máximo: (\d+) ms/],
+  ['Muestras con exceso ≥100 ms','',/Muestras con retraso de 100 ms o más: (\d+)/],
+  ['Rendimiento sostenido','iter/s',/Carga sostenida: ([\d.]+) iter/],
+  ['Variación del rendimiento','%',/desviación \/ media\): ([\d.]+)%/],
+  ['Memoria libre mínima','B',/Memoria libre mínima: (\d+) B/]
+];
+document.querySelector('#files').onchange=async e=>{
+  const out=document.querySelector('#comparison');out.replaceChildren();
+  const files=[...e.target.files];
+  if(files.length>2){out.textContent='Elige como máximo dos informes.';return;}
+  const entries=[];
+  for(const file of files){
+    const text=await file.text();
+    if(!text.includes('ESP32 Stress Lab') || !text.includes('Resultado:')){
+      out.append(document.createTextNode(file.name+' · formato desconocido. '));continue;
+    }
+    entries.push({name:file.name,text});
+  }
+  for(const [label,unit,regex] of fields){
+    const values=entries.map(entry=>{const m=entry.text.match(regex);return m?Number(m[1]):null;});
+    if(values.every(v=>v===null))continue;
+    const title=document.createElement('h3');title.textContent=label;out.append(title);
+    entries.forEach((entry,i)=>{
+      const row=document.createElement('div'),bar=document.createElement('meter');
+      row.textContent=entry.name+' · '+(values[i]===null?'sin dato':values[i].toLocaleString('es')+' '+unit)+' ';
+      if(values[i]!==null){bar.max=Math.max(1,...values);bar.value=values[i];row.append(bar);}
+      out.append(row);
+    });
+  }
+  if(entries.length){
+    const note=document.createElement('p');note.textContent='Las barras comparten escala dentro de cada métrica. Un ensayo más largo tiene más oportunidades de registrar un pico. Compara fuentes con igual duración, patrón, núcleos y radio.';out.append(note);
+  }
+};
+</script></html>
